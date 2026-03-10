@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão Contratos & Insumos — Silvicultura</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0f1a;--s1:#111827;--s2:#1a2234;--s3:#222d42;--ac:#22d3ee;--ac2:#06b6d4;--w:#f59e0b;--d:#ef4444;--g:#10b981;--p:#a78bfa;--tx:#e2e8f0;--t2:#94a3b8;--t3:#64748b;--bd:#1e293b}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+.hdr{background:linear-gradient(135deg,#0f172a,#1e1b4b 50%,#0f172a);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr h1{font-family:'Space Mono',monospace;font-size:15px;color:var(--ac);letter-spacing:2px}
+.hdr .sub{font-size:10px;color:var(--t3);letter-spacing:1px}
+.hd{font-family:'Space Mono',monospace;font-size:11px;color:var(--t2);background:var(--s2);padding:4px 10px;border-radius:5px;border:1px solid var(--bd)}
+.season-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.5px;margin-left:4px}
+.st-rain{background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.st-pest{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.st-plant{background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.st-maint{background:rgba(245,158,11,.2);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.nav{display:flex;gap:2px;padding:8px 20px;background:var(--s1);border-bottom:1px solid var(--bd);overflow-x:auto}
+.nav button{font-family:'DM Sans';padding:6px 11px;border:1px solid var(--bd);background:0;color:var(--t2);border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;white-space:nowrap;transition:.2s}
+.nav button:hover{border-color:var(--ac);color:var(--ac)}.nav button.on{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+.mn{padding:16px 20px;max-width:1600px;margin:0 auto}
+.sec{display:none}.sec.on{display:block;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.st2{font-family:'Space Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--ac);margin-bottom:14px;padding-bottom:5px;border-bottom:1px solid var(--bd)}
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:16px}
+.k{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:12px;position:relative;overflow:hidden;transition:.3s}.k:hover{border-color:var(--ac)}
+.k::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:9px 9px 0 0}
+.k.c::before{background:var(--ac)}.k.g::before{background:var(--g)}.k.a::before{background:var(--w)}.k.r::before{background:var(--d)}.k.p::before{background:var(--p)}
+.kl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:4px}
+.kv{font-family:'Space Mono',monospace;font-size:20px;font-weight:700}
+.k.c .kv{color:var(--ac)}.k.g .kv{color:var(--g)}.k.a .kv{color:var(--w)}.k.r .kv{color:var(--d)}.k.p .kv{color:var(--p)}
+.ks{font-size:9px;color:var(--t3);margin-top:2px}
+.tw{overflow-x:auto;border:1px solid var(--bd);border-radius:9px;background:var(--s1)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:var(--s2);font-weight:600;text-transform:uppercase;font-size:9px;letter-spacing:.7px;color:var(--t2);padding:8px 8px;text-align:left;position:sticky;top:0;white-space:nowrap;border-bottom:2px solid var(--bd)}
+td{padding:6px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+tr:hover td{background:rgba(34,211,238,.03)}
+.b{display:inline-block;padding:2px 7px;border-radius:16px;font-size:9px;font-weight:600}
+.bg{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.ba{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.br{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.bb{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.bgy{background:rgba(100,116,139,.15);color:#94a3b8;border:1px solid rgba(100,116,139,.3)}
+.bc{background:rgba(34,211,238,.15);color:#22d3ee;border:1px solid rgba(34,211,238,.3)}
+.bp{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)}
+.sb{width:70px;height:6px;background:var(--s3);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.sf{height:100%;border-radius:3px}
+.tb{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.si{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:6px 10px;border-radius:6px;font-size:11px;font-family:'DM Sans';outline:0;transition:.2s}.si:focus{border-color:var(--ac)}
+.fb{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:5px 10px;border-radius:6px;font-size:10px;cursor:pointer;font-family:'DM Sans';transition:.2s}.fb:hover,.fb.on{border-color:var(--ac);color:var(--ac)}
+.btn{padding:6px 14px;border:none;border-radius:6px;font-family:'DM Sans';font-size:11px;font-weight:600;cursor:pointer;transition:.2s}
+.b1{background:var(--ac);color:var(--bg)}.b1:hover{background:var(--ac2)}
+.b2{background:0;border:1px solid var(--bd);color:var(--t2)}.b2:hover{border-color:var(--ac);color:var(--ac)}
+.b3{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.b4{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.b5{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.bs2{padding:4px 9px;font-size:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:1100px){.g2,.g3{grid-template-columns:1fr}}
+.cc{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:14px;margin-bottom:12px}
+.ct{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.bw{display:flex;align-items:flex-end;gap:3px;height:150px;overflow-x:auto}
+.bc2{display:flex;flex-direction:column;align-items:center;min-width:20px;flex:1;gap:2px}
+.bar{border-radius:3px 3px 0 0;width:100%;min-width:8px;transition:.5s}.bar:hover{filter:brightness(1.3)}
+.bl{font-size:7px;color:var(--t3);max-width:42px;overflow:hidden;text-overflow:ellipsis;text-align:center;white-space:nowrap}
+.bv2{font-family:'Space Mono',monospace;font-size:8px;color:var(--t2)}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}.mbg.open{display:flex}
+.mdl{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;max-width:620px;width:92%;max-height:85vh;overflow-y:auto}
+.mdl h3{font-family:'Space Mono',monospace;color:var(--ac);font-size:14px;margin-bottom:12px}
+.mc{float:right;background:0;border:0;color:var(--t3);cursor:pointer;font-size:16px}
+.fg{margin-bottom:9px}.fl{display:block;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:2px}
+.fi{width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:6px 9px;border-radius:6px;font-size:11px;font-family:'DM Sans';outline:0}.fi:focus{border-color:var(--ac)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-bottom:12px}
+.dc{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:7px}.dc:hover{border-color:var(--ac)}
+.dc label{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:2px}
+.dc input{width:100%;background:var(--s3);border:1px solid var(--bd);color:var(--tx);padding:4px 6px;border-radius:4px;font-family:'Space Mono',monospace;font-size:11px;outline:0;text-align:right}.dc input:focus{border-color:var(--ac)}
+.dc .pv{font-size:8px;color:var(--t3);margin-top:2px;font-family:'Space Mono',monospace}
+.ib{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px;margin-bottom:12px;font-size:11px;line-height:1.6;color:var(--t2)}.ib strong{color:var(--ac)}
+.ha{display:flex;align-items:center;gap:5px;padding:5px 9px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:6px;margin-bottom:7px;font-size:10px;color:#fbbf24}
+.mono{font-family:'Space Mono',monospace}
+.sap{font-family:'Space Mono',monospace;font-size:10px;color:var(--p);background:rgba(167,139,250,.1);padding:1px 5px;border-radius:3px}
+.tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;letter-spacing:.4px;margin-right:2px}
+.tr2{background:rgba(59,130,246,.2);color:#60a5fa}.tp2{background:rgba(239,68,68,.2);color:#f87171}.tg2{background:rgba(16,185,129,.2);color:#34d399}.tw3{background:rgba(245,158,11,.2);color:#fbbf24}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--g);color:#fff;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;z-index:300;transform:translateY(80px);opacity:0;transition:.3s}.toast.sh{transform:translateY(0);opacity:1}
+.ac3{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;align-items:center;gap:10px;transition:.2s}.ac3:hover{border-color:var(--ac)}
+.wf{display:inline-flex;align-items:center;gap:3px;flex-wrap:wrap}.wf-s{padding:2px 6px;border-radius:4px;font-size:8px;font-weight:600;white-space:nowrap}.wf-on{background:var(--ac);color:var(--bg)}.wf-ok{background:rgba(16,185,129,.2);color:#34d399}.wf-off{background:var(--s3);color:var(--t3)}
+.wf-l{width:12px;height:2px;background:var(--bd)}.wf-lo{background:var(--g)}
+.dt{display:flex;gap:4px;margin-bottom:8px}.dt-t{padding:4px 12px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--bd);transition:.2s}.dt-t.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}.dt-t:hover{border-color:var(--ac)}
+.ed{background:var(--s3);border:1px solid transparent;border-radius:3px;padding:1px 3px;font-family:'Space Mono',monospace;font-size:10px;color:var(--tx);width:55px;text-align:right;outline:0}.ed:focus{border-color:var(--ac)}
+.sig{text-align:center;padding:20px;font-size:10px;color:var(--t3);border-top:1px solid var(--bd);margin-top:24px}.sig span{color:var(--ac);font-weight:600}
+.exp-bar{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+@media print{.hdr,.nav,.tb,.exp-bar,.sig,button,.fb,.btn,.si,.dt{display:none!important}.mn{padding:8px}.sec{display:block!important}.k{border:1px solid #ccc;break-inside:avoid}.tw{border:1px solid #ccc}th{background:#eee;color:#333}td{color:#333;border-color:#ddd}body{background:#fff;color:#333}.b{border:1px solid #999;color:#333}.cc{border:1px solid #ccc;break-inside:avoid}.st2{color:#0891b2;border-color:#ccc}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><h1>⬡ GESTÃO CONTRATOS</h1><div class="sub">Silvicultura — Insumos & Suprimentos</div></div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div id="seasonInfo"></div>
+    <div class="hd" id="hD"></div>
+  </div>
+</div>
+<nav class="nav" id="nv"></nav>
+<div class="mn"><div id="pg"></div></div>
+<div class="mbg" id="mB" onclick="if(event.target===this)cM()"><div class="mdl" id="mC"></div></div>
+<div class="toast" id="tt"></div>
+
+<script>
+const LS={g(k){try{return JSON.parse(localStorage.getItem('gcv5_'+k))}catch{return null}},s(k,v){try{localStorage.setItem('gcv5_'+k,JSON.stringify(v))}catch{}}};
+let S={mats:[],cts:[],rcs:[],acts:[],dh:{},rf:[],cc:[]};
+const TABS=[{id:'dash',l:'Dashboard'},{id:'daily',l:'Registro Diário'},{id:'wh',l:'Warehouse'},{id:'ct2',l:'Contratos'},{id:'rc2',l:'Requisições'},{id:'pa',l:'Plano de Ação'},{id:'tl',l:'Time Line'},{id:'rf2',l:'Consumo RF'},{id:'hist',l:'Histórico'},{id:'tools',l:'Ferramentas'}];
+let cT='dash',nx=300;
+const MS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const DV=['Água Clara MS','Bataguassu MS'];
+const RC_ST=['RC Criada','Em Aprovação','Pedido Emitido','Entrega Solicitada','Em Trânsito','Entregue'];
+const SEASONS=[{tags:['Plantio','Chuva'],cls:['st-plant','st-rain']},{tags:['Plantio','Chuva'],cls:['st-plant','st-rain']},{tags:['Chuva'],cls:['st-rain']},{tags:['Pragas'],cls:['st-pest']},{tags:['Pragas','Formiga'],cls:['st-pest','st-pest']},{tags:['Formiga'],cls:['st-pest']},{tags:['Formiga'],cls:['st-pest']},{tags:['Manutenção'],cls:['st-maint']},{tags:['Manutenção'],cls:['st-maint']},{tags:['Preparo'],cls:['st-maint']},{tags:['Plantio'],cls:['st-plant']},{tags:['Plantio','Chuva'],cls:['st-plant','st-rain']}];
+
+function init(){
+  const s=LS.g('state');
+  if(s){S=s;nx=Math.max(300,...(S.mats||[]).map(m=>m.id),...(S.cts||[]).map(c=>c.id),...(S.rcs||[]).map(r=>r.id),...(S.acts||[]).map(a=>a.id))+1}
+  else iDef();
+  if(!S.cc)S.cc=[];
+  if(!S.gsUrl)S.gsUrl='https://script.google.com/macros/s/AKfycbz8BnLnQxuPqxYC8Y36vbv1pCLjc5RouhYAbR2Wdth2cDOaKmd3iRqLnP3X53uC6hEAFg/exec';
+  document.getElementById('hD').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  // Season info
+  const cm=new Date().getMonth();
+  const si=SEASONS[cm];
+  document.getElementById('seasonInfo').innerHTML=si.tags.map((t,i)=>`<span class="season-tag ${si.cls[i]}">${t}</span>`).join('');
+  rN();R();
+}
+
+function iDef(){
+S.mats=[
+{id:1,g:'Herb Pós',m:'Agile / Missil',sap:'90000769',e:7650,mn:30,rp:50,mx:60,u:'L'},
+{id:2,g:'Herb Pós',m:'Outliner',sap:'90000791',e:2980,mn:30,rp:50,mx:60,u:'L'},
+{id:3,g:'Herb Pós',m:'Topinan',sap:'90000776',e:18290,mn:30,rp:50,mx:60,u:'L'},
+{id:4,g:'Herb Pós',m:'Glifosato',sap:'90000748',e:36520,mn:30,rp:50,mx:60,u:'KG'},
+{id:5,g:'Herb Pré',m:'Esplanade',sap:'90000815',e:2013,mn:30,rp:50,mx:60,u:'L'},
+{id:6,g:'Herb Pré',m:'Sumizyn / Osbar',sap:'90000775',e:7370,mn:30,rp:50,mx:60,u:'KG'},
+{id:7,g:'Herb Pré',m:'Sunward / Distinto',sap:'90000749',e:2180,mn:30,rp:50,mx:60,u:'KG'},
+{id:8,g:'Inseticida',m:'Fipronil',sap:'90000774',e:3330,mn:30,rp:50,mx:60,u:'KG'},
+{id:9,g:'Isca',m:'Isca Dinagro',sap:'70000138',e:28565,mn:10,rp:15,mx:30,u:'KG'},
+{id:10,g:'Isca',m:'Isca Landrin',sap:'90000761',e:105030,mn:10,rp:15,mx:30,u:'KG'},
+{id:11,g:'Isca',m:'Isca Sulfluramida',sap:'90000834',e:140975,mn:10,rp:15,mx:30,u:'KG'},
+{id:12,g:'Óleo',m:'Óleo Mineral',sap:'90000822',e:59869,mn:30,rp:40,mx:60,u:'L'},
+{id:13,g:'Plantio',m:'Gel Polimero',sap:'90000821',e:14675,mn:30,rp:50,mx:60,u:'KG'},
+{id:14,g:'Plantio',m:'Map',sap:'90000804',e:3000,mn:30,rp:50,mx:60,u:'KG'},
+{id:15,g:'Pragas',m:'Decis',sap:'90000811',e:4508,mn:30,rp:50,mx:60,u:'L'},
+{id:16,g:'Pragas',m:'Dipel',sap:'90000784',e:14700,mn:30,rp:50,mx:60,u:'L'},
+{id:17,g:'Pragas',m:'Prez / Terminus',sap:'90000763',e:18030,mn:30,rp:50,mx:60,u:'KG'},
+{id:18,g:'Plantio',m:'Actara / Warrant',sap:'90000783',e:2235,mn:30,rp:50,mx:60,u:'KG'},
+{id:19,g:'Adubo',m:'Boro',sap:'90000782',e:77755,mn:30,rp:50,mx:60,u:'KG'},
+{id:20,g:'Fungicida',m:'Nativo',sap:'90000820',e:1955,mn:30,rp:50,mx:60,u:'L'},
+{id:21,g:'Fungicida',m:'Comet',sap:'90000809',e:525,mn:30,rp:50,mx:60,u:'L'},
+{id:22,g:'Isca',m:'Isca Mirex',sap:'90000812',e:0,mn:10,rp:15,mx:30,u:'KG'},
+{id:23,g:'Herb Pós',m:'Valeos',sap:'90000793',e:55,mn:30,rp:50,mx:60,u:'KG'},
+{id:24,g:'Herb Pós',m:'Solara / Ponteiro',sap:'90000792',e:160,mn:30,rp:50,mx:60,u:'L'},
+{id:25,g:'Herb Pré',m:'Block / Goal',sap:'90000768',e:360,mn:30,rp:50,mx:60,u:'L'},
+{id:26,g:'Herb Pré',m:'Falcon',sap:'90000780',e:0,mn:30,rp:50,mx:60,u:'L'},
+];
+S.cts=[
+{id:1,g:'Glifosato',matId:4,ins:'Zapp',fo:'Syngenta',vc:'2025-12-31',nu:'4600000757',st:'Inativo',fx:5816002,ab:0,sd:0,pr:21.23,tp:'Anual',rp:'',em:'',tel:'',pe:12},
+{id:2,g:'Óleo Mineral',matId:12,ins:'Óleo',fo:'J.A Chemical',vc:'2025-12-31',nu:'4600000755',st:'Finalizado',fx:4110932,ab:112508,sd:2.7,pr:7.45,tp:'Anual',rp:'',em:'',tel:'',pe:5},
+{id:3,g:'Topinan',matId:3,ins:'Topinam',fo:'Futuragro',vc:'2025-12-31',nu:'4600000753',st:'Finalizado',fx:2853351,ab:220203,sd:7.7,pr:43,tp:'Anual',rp:'',em:'',tel:'',pe:7},
+{id:4,g:'Sunward',matId:7,ins:'Distinto',fo:'Futuragro',vc:'2025-12-31',nu:'4600001081',st:'Finalizado',fx:7453175,ab:2291855,sd:30.8,pr:295,tp:'Anual',rp:'',em:'',tel:'',pe:7},
+{id:5,g:'Decis',matId:15,ins:'Decis',fo:'Envu',vc:'2026-12-31',nu:'4600001739',st:'Aprovação',fx:432406,ab:432406,sd:100,pr:60.23,tp:'Anual',rp:'',em:'',tel:'',pe:10},
+{id:6,g:'Dipel',matId:16,ins:'Dipel',fo:'Sumitomo',vc:'2026-12-31',nu:'4600001776',st:'Aprovação',fx:2882024,ab:2882024,sd:100,pr:36.35,tp:'Anual',rp:'',em:'',tel:'',pe:10},
+];
+S.rcs=[];
+S.acts=[{id:1,resp:'Bruno',ass:'Sungain',obs:'Formulários TES',st:'Em andamento',dt:'06/02/2026'},{id:2,resp:'Lucas Rafael',ass:'Contratos',obs:'Encaminhar contratos 2026',st:'Em andamento',dt:'Contínuo'},{id:3,resp:'Lucas Marques',ass:'Contratos',obs:'Acompanhar aprovações',st:'Em andamento',dt:'Contínuo'}];
+S.rf=[
+{ins:'Glifosato',matId:4,cat:'Herb Pós',h24:[60527,58401,71262,65462,63377,70237,54927,51102,59042,68472,66385,66174],h25:[56460,71780,74547,64570,55800,60340,49460,41500,41545,30680,50620,60480],m26:[48791,50259,49054,45250,47008,49189,38778,38996,45542,39950,36864,42328]},
+{ins:'Isca Sulfluramida',matId:11,cat:'Formicida',h24:[156846,177844,187726,188937,188631,171359,172502,211798,232648,148979,93970,86827],h25:[0,0,0,4450,51525,243950,234800,236175,214525,116925,71825,59125],m26:[59424,58467,75607,213336,245564,238182,204643,237899,246299,115222,51255,58452]},
+{ins:'Óleo Mineral',matId:12,cat:'Adjuvante',h24:[33154,29292,33264,30536,40442,73266,68314,72769,72497,57197,47325,36466],h25:[17055,26650,46545,66020,66235,113375,138575,97650,214550,96825,33400,21965],m26:[28232,26658,25630,40842,56730,87536,76150,77304,94314,66475,57638,26070]},
+{ins:'Fipronil',matId:8,cat:'Inseticida',h24:[836,1152,1349,1377,1530,1674,1619,1533,1536,1521,1791,1413],h25:[1248,1352,1384,1511,1388,1644,1296,1338,2245,990,1147,942],m26:[938,1254,1329,1255,1207,1160,1307,1244,1173,1253,1257,884]},
+{ins:'Dipel',matId:16,cat:'Inset Bio',h24:[0,1860,2040,8780,4880,21340,1280,1280,6000,400,15750,15750],h25:[0,1860,2040,8780,4880,21340,1280,1280,6000,400,720,4600],m26:[19500,22425,22425,19500,19500,19500,19500,19500,19500,19500,19500,19500]},
+{ins:'Decis',matId:15,cat:'Inseticida',h24:[0,348,1778,1425,3087,3107,2340,2952,271,86,0,526],h25:[0,348,1778,1425,3087,3107,2340,2952,271,86,0,526],m26:[4800,5520,5520,4800,4800,4800,4800,4800,4800,4800,4800,4800]},
+{ins:'Agile / Missil',matId:1,cat:'Herb Pós',h24:[1600,1460,440,640,1140,200,120,100,40,1760,4580,6200],h25:[4360,4300,2360,2600,3680,2040,2320,1580,940,1760,4580,6200],m26:[4388,1268,1599,1533,1522,959,1013,1127,1102,1261,1697,1684]},
+{ins:'Topinan',matId:3,cat:'Herb Pós',h24:[8409,10546,9328,10229,9591,8940,8964,8903,10635,8206,7102,7559],h25:[1520,5660,6980,7640,4460,4240,3840,5420,7780,4140,2540,4280],m26:[6830,6648,6830,6824,7757,7327,7048,7519,7442,6419,4473,7199]},
+{ins:'Sumizyn / Osbar',matId:6,cat:'Herb Pré',h24:[3024,3174,4057,3784,3911,4450,3711,3461,3659,4250,4582,4054],h25:[2780,3480,4010,3395,3575,2100,2015,2250,2955,2425,2470,2345],m26:[2249,2908,2898,2656,2792,1899,2091,2025,1910,2706,2644,2138]},
+{ins:'Gel Polimero',matId:13,cat:'Plantio',h24:[4576,6235,7345,7535,8087,8861,8598,8082,8078,8016,9437,7511],h25:[4200,5550,6100,8725,3225,3950,5800,8625,6825,7975,4100,1375],m26:[4057,5977,6164,5892,5822,5689,6441,6106,5746,6166,6096,4215]},
+{ins:'Map',matId:14,cat:'Fertilizante',h24:[691,940,1108,1137,1220,1336,1297,1219,1218,1209,1423,1134],h25:[650,800,1100,1250,1250,525,692,875,1550,1600,1925,875],m26:[829,1009,1096,1021,950,894,1001,956,905,964,985,708]},
+];
+S.cc=[];
+S.gsUrl='https://script.google.com/macros/s/AKfycbz8BnLnQxuPqxYC8Y36vbv1pCLjc5RouhYAbR2Wdth2cDOaKmd3iRqLnP3X53uC6hEAFg/exec';
+}
+
+function sv(){LS.s('state',S)}
+const ni=()=>++nx;
+const fm=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':typeof n==='number'?n.toFixed(0):n;
+const fd=n=>typeof n==='number'&&n<999?n.toFixed(1):'∞';
+const fR=n=>'R$'+Number(n).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+const bd=(c,t)=>`<span class="b ${c}">${t}</span>`;
+const sb2=s=>({Concluido:'bg',Finalizado:'bg','Em andamento':'bb','Não iniciado':'bgy',Cancelado:'br',Aprovação:'ba',Inativo:'bgy'}[s]||'bgy');
+const td2=()=>new Date().toISOString().split('T')[0];
+const sapTag=s=>s?`<span class="sap">${s}</span>`:'';
+const matOpts=()=>S.mats.map(m=>`<option value="${m.id}">${m.sap||''} — ${m.m}</option>`).join('');
+const getMat=id=>S.mats.find(x=>x.id===+id);
+function toast(m){const t=document.getElementById('tt');t.textContent=m;t.classList.add('sh');setTimeout(()=>t.classList.remove('sh'),2200)}
+function oM(h){document.getElementById('mC').innerHTML=h;document.getElementById('mB').classList.add('open')}
+function cM(){document.getElementById('mB').classList.remove('open')}
+function gC(id){const h=S.dh[id]||{};const e=Object.entries(h).sort((a,b)=>a[0].localeCompare(b[0]));if(e.length<2){const m=S.mats.find(x=>x.id===id);const r=S.rf.find(x=>x.matId===id);if(r)return r.m26.reduce((a,b)=>a+b,0)/12/30;return 0}let tc=0,ds=0;for(let i=1;i<e.length;i++){const d=e[i-1][1]-e[i][1];if(d>0)tc+=d;ds+=(new Date(e[i][0])-new Date(e[i-1][0]))/864e5}return ds>0?tc/ds:0}
+function gD(m){const c=gC(m.id);return c>0?m.e/c:999}
+function gS(d,mn){return d<mn*.7?{l:'Crítico',c:'br',v:'d'}:d<mn?{l:'Atenção',c:'ba',v:'w'}:{l:'Normal',c:'bg',v:'g'}}
+function sB(d,mx){const p=Math.min(100,(d/mx)*100);const c=p<40?'var(--d)':p<70?'var(--w)':'var(--g)';return`<div class="sb"><div class="sf" style="width:${p}%;background:${c}"></div></div>`}
+function rcWf(si){return RC_ST.map((s,i)=>`${i>0?`<div class="wf-l ${i<=si?'wf-lo':''}"></div>`:''}<div class="wf-s ${i<si?'wf-ok':i===si?'wf-on':'wf-off'}">${s}</div>`).join('')}
+function exportData(){const d=td2();const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`gestao_contratos_${d}.json`;a.click();toast('✓ Exportado!')}
+function importData(){document.getElementById('impF').click()}
+function handleImp(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{S=JSON.parse(ev.target.result);if(!S.cc)S.cc=[];if(!S.gsUrl)S.gsUrl='https://script.google.com/macros/s/AKfycbz8BnLnQxuPqxYC8Y36vbv1pCLjc5RouhYAbR2Wdth2cDOaKmd3iRqLnP3X53uC6hEAFg/exec';sv();toast('✓ Importado!');R()}catch{toast('Erro no arquivo')}};r.readAsText(f)}
+function genPDF(){window.print()}
+function rN(){document.getElementById('nv').innerHTML=TABS.map(t=>`<button class="${t.id===cT?'on':''}" onclick="cT='${t.id}';rN();R()">${t.l}</button>`).join('')}
+function R(){const fn={dash:rDash,daily:rDy,wh:rW,ct2:rCt,rc2:rRc,pa:rPa,tl:rTl,rf2:rRf,hist:rH,tools:rTo};document.getElementById('pg').innerHTML=`<div class="exp-bar"><button class="btn b1 bs2" onclick="exportData()">⬇ Exportar</button><button class="btn b2 bs2" onclick="importData()">⬆ Importar</button><input type="file" id="impF" accept=".json" style="display:none" onchange="handleImp(event)"><button class="btn b5 bs2" onclick="genPDF()">📄 PDF</button></div><div class="sec on">${(fn[cT]||rDash)()}</div><div class="sig">Feito por <span>Lucas Marques</span></div>`}
+
+// ===== DASHBOARD =====
+function rDash(){const ms=S.mats.map(m=>({...m,dias:gD(m),cons:gC(m.id)*30}));const cr=ms.filter(m=>m.dias<m.mn&&m.cons>0).length;const at=ms.filter(m=>m.dias>=m.mn&&m.dias<m.rp&&m.cons>0).length;const nm2=ms.filter(m=>m.dias>=m.rp||m.cons===0).length;const pd=S.acts.filter(p=>p.st==='Em andamento'||p.st==='Não iniciado').length;const cov=ms.filter(m=>m.cons>0);const avg=cov.length?cov.reduce((a,m)=>a+m.dias,0)/cov.length:0;
+const so=ms.filter(m=>m.cons>0).sort((a,b)=>a.dias-b.dias);const mx=Math.max(...so.map(m=>m.dias),60);
+let ch=`<div class="cc"><div class="ct">Dias de Estoque — Todos (${so.length})</div><div style="overflow-x:auto"><div class="bw" style="min-width:${so.length*48}px">`;
+so.forEach(m=>{const h=Math.max(4,(m.dias/mx)*130);const s=gS(m.dias,m.mn);const cl=s.v==='d'?'var(--d)':s.v==='w'?'var(--w)':'var(--g)';ch+=`<div class="bc2"><div class="bv2">${m.dias.toFixed(0)}d</div><div class="bv2" style="font-size:7px;color:var(--t3)">${fm(m.e)}</div><div class="bar" style="height:${h}px;background:${cl}"></div><div class="bl">${m.m}</div></div>`});ch+=`</div></div></div>`;
+const rup=ms.filter(m=>m.dias<60&&m.cons>0).sort((a,b)=>a.dias-b.dias);
+let rH=`<div class="cc"><div class="ct">⚠ Previsão de Ruptura</div>`;rup.slice(0,8).forEach(m=>{const dt=new Date();dt.setDate(dt.getDate()+Math.floor(m.dias));const cl=m.dias<15?'var(--d)':m.dias<30?'var(--w)':'var(--ac)';rH+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px"><span style="min-width:100px;font-weight:600">${m.m}</span>${sapTag(m.sap)}<span class="mono" style="min-width:35px;color:${cl};font-weight:700">${m.dias.toFixed(0)}d</span><div style="flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden"><div style="width:${Math.min(100,(m.dias/60)*100)}%;height:100%;background:${cl};border-radius:2px"></div></div><span style="font-size:9px;color:var(--t3)">${dt.toLocaleDateString('pt-BR')}</span></div>`});if(!rup.length)rH+=`<div style="color:var(--t3);font-size:11px">Nenhum material crítico</div>`;rH+=`</div>`;
+let f=window._dF||'all',q=(window._dQ||'').toLowerCase();let fd2=ms.filter(m=>{if(q&&!m.m.toLowerCase().includes(q)&&!m.g.toLowerCase().includes(q)&&!(m.sap||'').includes(q))return false;if(f==='crit')return m.dias<m.mn&&m.cons>0;if(f==='att')return m.dias>=m.mn&&m.dias<m.rp&&m.cons>0;if(f==='norm')return m.dias>=m.rp||m.cons===0;return true}).sort((a,b)=>a.dias-b.dias);
+let tbl=`<div class="st2">Materiais</div><div class="tb"><input class="si" style="width:180px" placeholder="Buscar (nome ou SAP)..." value="${window._dQ||''}" oninput="window._dQ=this.value;R()"><button class="fb ${f==='all'?'on':''}" onclick="window._dF='all';R()">Todos</button><button class="fb ${f==='crit'?'on':''}" onclick="window._dF='crit';R()">Crítico</button><button class="fb ${f==='att'?'on':''}" onclick="window._dF='att';R()">Atenção</button><button class="fb ${f==='norm'?'on':''}" onclick="window._dF='norm';R()">Normal</button></div><div class="tw" style="max-height:300px;overflow-y:auto"><table><thead><tr><th>SAP</th><th>Material</th><th>Grupo</th><th>Estoque</th><th>Cons/mês</th><th>Dias</th><th>Nível</th><th>Status</th></tr></thead><tbody>`;
+fd2.forEach(m=>{const s=gS(m.dias,m.mn);tbl+=`<tr><td>${sapTag(m.sap)}</td><td style="font-weight:600">${m.m}</td><td>${bd('bc',m.g)}</td><td class="mono">${fm(m.e)}</td><td class="mono">${fm(m.cons)}</td><td class="mono" style="font-weight:700;color:var(--${s.v==='d'?'d':s.v==='w'?'w':'g'})">${fd(m.dias)}</td><td>${sB(m.dias,m.mx)}</td><td>${bd(s.c,s.l)}</td></tr>`});tbl+=`</tbody></table></div>`;
+return`<div class="kg"><div class="k r"><div class="kl">Crítico</div><div class="kv">${cr}</div></div><div class="k a"><div class="kl">Atenção</div><div class="kv">${at}</div></div><div class="k g"><div class="kl">Normal</div><div class="kv">${nm2}</div></div><div class="k c"><div class="kl">Cobertura</div><div class="kv">${avg.toFixed(0)}d</div></div><div class="k p"><div class="kl">Ações</div><div class="kv">${pd}</div></div></div>${ch}<div class="g2">${rH}<div class="cc"><div class="ct">Índice de Cobertura</div>${cov.sort((a,b)=>a.dias-b.dias).slice(0,8).map(m=>{const p=Math.min(100,(m.dias/m.rp)*100);const cl=p<60?'var(--d)':p<100?'var(--w)':'var(--g)';return`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:10px"><span style="min-width:90px">${m.m}</span><div style="flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden"><div style="width:${p}%;height:100%;background:${cl};border-radius:3px"></div></div><span class="mono" style="min-width:35px;color:${cl}">${m.dias.toFixed(0)}d</span></div>`}).join('')}</div></div>${tbl}`}
+
+// ===== REGISTRO DIÁRIO =====
+function rDy(){const dv=window._dDiv||'total';
+let h=`<div class="st2">Registro Diário</div><div class="dt"><div class="dt-t ${dv==='total'?'on':''}" onclick="window._dDiv='total';R()">Total</div>`;DV.forEach(d=>h+=`<div class="dt-t ${dv===d?'on':''}" onclick="window._dDiv='${d}';R()">${d}</div>`);h+=`</div>`;
+h+=`<div class="tb"><input type="date" class="si" value="${td2()}" id="dDt" style="width:150px"><button class="btn b1 bs2" onclick="svD()">💾 Salvar</button><button class="btn b4 bs2" onclick="fetchGS()">🔄 Atualizar via Sheets</button><button class="btn b2 bs2" onclick="cfgGS()">⚙</button></div>`;
+// Google Sheets status panel
+const gsL=window._gsLog||null;
+if(gsL){
+  const acDone=gsL.divs.includes(DV[0]),btDone=gsL.divs.includes(DV[1]);
+  h+=`<div class="cc" style="margin-bottom:10px"><div class="ct">🔄 Última Sincronização — ${gsL.dt}</div>`;
+  h+=`<div style="display:flex;gap:12px;margin-bottom:6px">`;
+  h+=`<div style="display:flex;align-items:center;gap:4px;font-size:11px">${acDone?'<span style="color:var(--g);font-weight:700">✓</span>':'<span style="color:var(--d);font-weight:700">✕</span>'} Água Clara MS ${acDone?bd('bg','Atualizado'):bd('br','Pendente')}</div>`;
+  h+=`<div style="display:flex;align-items:center;gap:4px;font-size:11px">${btDone?'<span style="color:var(--g);font-weight:700">✓</span>':'<span style="color:var(--d);font-weight:700">✕</span>'} Bataguassu MS ${btDone?bd('bg','Atualizado'):bd('br','Pendente')}</div>`;
+  h+=`</div>`;
+  if(gsL.mats>0)h+=`<div style="font-size:10px;color:var(--t2)">${gsL.mats} materiais atualizados em ${gsL.divs.length} divisão(ões)</div>`;
+  if(!acDone||!btDone){
+    const missing=!acDone?DV[0]:DV[1];
+    h+=`<div style="margin-top:6px"><button class="btn b4 bs2" onclick="fetchGS('${missing}')">🔄 Atualizar somente ${missing}</button></div>`;
+  }
+  h+=`</div>`;
+}
+if(dv==='total'){h+=`<div class="ib">Selecione <strong>Água Clara</strong> ou <strong>Bataguassu</strong> para registrar manualmente, ou use <strong>🔄 Atualizar via Sheets</strong> para importar do Google Sheets.</div><div class="dg">`;S.mats.forEach(m=>{const a=S.dh[m.id+'_'+DV[0]]||{},b2=S.dh[m.id+'_'+DV[1]]||{};const la=Object.keys(a).sort().pop(),lb=Object.keys(b2).sort().pop();h+=`<div class="dc"><label>${sapTag(m.sap)} ${m.m}</label><input value="${m.e}" disabled><div class="pv">AC:${la?fm(a[la]):0} BT:${lb?fm(b2[lb]):0}</div></div>`});h+=`</div>`}
+else{h+=`<div class="dg">`;S.mats.forEach(m=>{const k=m.id+'_'+dv,hi=S.dh[k]||{},l=Object.keys(hi).sort().pop();h+=`<div class="dc"><label>${sapTag(m.sap)} ${m.m}</label><input type="number" id="dd_${m.id}" value="${l?hi[l]:0}"><div class="pv">Ant: ${l?fm(hi[l]):'—'}</div></div>`});h+=`</div>`}
+h+=`<div id="gsHist"></div>`;
+// Daily update history
+h+=`<div class="st2" style="margin-top:16px">Historico de Atualizacoes</div>`;
+const allDates=[...new Set(Object.keys(S.dh).filter(k=>k.includes('_')).flatMap(k=>Object.keys(S.dh[k])))].sort().reverse().slice(0,30);
+if(allDates.length){
+  h+=`<div class="tw" style="max-height:300px;overflow-y:auto"><table><thead><tr><th>Data</th><th>Divisao</th><th>Materiais</th><th>Exemplos</th></tr></thead><tbody>`;
+  allDates.forEach(dt=>{
+    DV.forEach(dv=>{
+      const items=S.mats.filter(m=>{const k=m.id+'_'+dv;return S.dh[k]&&S.dh[k][dt]!==undefined});
+      if(!items.length)return;
+      const dvLbl=dv.includes('Clara')?bd('bp','Agua Clara'):bd('ba','Bataguassu');
+      const top3=items.slice(0,3).map(m=>`${m.m}: ${fm(S.dh[m.id+'_'+dv][dt])}`).join(', ');
+      h+=`<tr><td class="mono" style="font-size:10px">${dt}</td><td>${dvLbl}</td><td class="mono" style="font-weight:600">${items.length}</td><td style="font-size:9px;color:var(--t3);max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${top3}${items.length>3?' ...':''}</td></tr>`;
+    });
+  });
+  h+=`</tbody></table></div>`;
+}else{h+=`<div style="color:var(--t3);font-size:11px;padding:12px;text-align:center">Nenhum registro ainda. Use Salvar ou Atualizar via Sheets.</div>`}
+return h}
+function svD(){const dv=window._dDiv||'total';if(dv==='total'){toast('Selecione uma divisão');return}const dt=document.getElementById('dDt').value;if(!dt){toast('Data');return}S.mats.forEach(m=>{const inp=document.getElementById('dd_'+m.id);if(!inp)return;const v=parseFloat(inp.value);if(isNaN(v))return;const k=m.id+'_'+dv;if(!S.dh[k])S.dh[k]={};S.dh[k][dt]=v;let t=0;DV.forEach(d=>{const h=S.dh[m.id+'_'+d]||{};const l=Object.keys(h).sort().pop();if(l)t+=h[l]});m.e=t;if(!S.dh[m.id])S.dh[m.id]={};S.dh[m.id][dt]=t});sv();toast('✓ Salvo!');R()}
+// ===== GOOGLE SHEETS INTEGRATION =====
+function cfgGS(){
+  oM(`<button class="mc" onclick="cM()">✕</button><h3>⚙ Configurar Google Sheets</h3>
+<div class="ib">O sistema usa o <strong>Google Apps Script</strong> como intermediário para ler e escrever dados no Google Sheets.<br><br>A URL já está configurada. Altere apenas se necessário.</div>
+<div class="fg"><label class="fl">URL do Apps Script (Web App)</label><input class="fi" id="gsUrl" value="${S.gsUrl||''}" placeholder="https://script.google.com/macros/s/.../exec"></div>
+<div class="ib" style="font-size:10px"><strong>Formato das colunas no Sheets:</strong><br>
+<strong>Data | Divisão | Código SAP | Nome Material | Quantidade</strong><br>
+Cada material é uma linha. O Frontend 2 (mobile) envia nesse formato.</div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="svGSUrl()">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)
+}
+function svGSUrl(){S.gsUrl=document.getElementById('gsUrl').value.trim();sv();cM();toast('URL salva!')}
+function parseDivName(raw){
+  const r=raw.trim().toLowerCase();
+  if(r.includes('água clara')||r.includes('agua clara')||r==='acl'||r==='ac')return DV[0];
+  if(r.includes('bataguassu')||r==='btg'||r==='bt')return DV[1];
+  return null;
+}
+async function fetchGS(onlyDiv){
+  if(!S.gsUrl){cfgGS();return}
+  const dt=document.getElementById('dDt')?.value||td2();
+  toast('⏳ Buscando dados...');
+  try{
+    const resp=await fetch(S.gsUrl,{redirect:'follow'});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const txt=await resp.text();
+    if(txt.trim().startsWith('<')||txt.includes('<!DOCTYPE')){
+      toast('Apps Script desatualizado! Reimplante com Nova Versão.');return;
+    }
+    let json;try{json=JSON.parse(txt)}catch{toast('Resposta inválida do servidor');console.error(txt);return}
+    if(!json.success){throw new Error(json.error||'Erro desconhecido')}
+    const allRows=json.rows||[];
+    console.log('GS:',allRows.length,'linhas. Datas:',JSON.stringify([...new Set(allRows.map(r=>r.data))]));
+    if(!allRows.length){toast('Planilha vazia');window._gsLog={dt,divs:[],mats:0};R();return}
+    // Client-side date filter (flexible)
+    const rows=allRows.filter(r=>{
+      const rd=String(r.data||'').trim();
+      if(rd===dt||rd.substring(0,10)===dt)return true;
+      const p=rd.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if(p){if(`${p[3]}-${p[2].padStart(2,'0')}-${p[1].padStart(2,'0')}`===dt)return true;if(`${p[3]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`===dt)return true}
+      const dN=rd.replace(/\D/g,'').substring(0,8);if(dN===dt.replace(/\D/g,''))return true;
+      try{const d=new Date(rd);if(!isNaN(d)){const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');if(`${y}-${mo}-${dy}`===dt)return true}}catch{}
+      return false;
+    });
+    console.log('GS: filtradas',rows.length,'linhas para',dt);
+    if(!rows.length){toast(`Nenhum dado para ${dt} (${allRows.length} linhas no total)`);window._gsLog={dt,divs:[],mats:0};R();return}
+    let updatedDivs=[],totalMats=0;
+    rows.forEach(r=>{
+      const div=parseDivName(String(r.divisao||''));
+      if(!div)return;
+      if(onlyDiv&&div!==onlyDiv)return;
+      const sapStr=String(r.sap||'').trim();
+      const mat=S.mats.find(m=>m.sap===sapStr||m.sap===sapStr.replace(/^0+/,''));
+      if(!mat)return;
+      const v=Number(r.quantidade);
+      if(isNaN(v))return;
+      const k=mat.id+'_'+div;
+      if(!S.dh[k])S.dh[k]={};
+      S.dh[k][dt]=v;
+      totalMats++;
+      if(!updatedDivs.includes(div))updatedDivs.push(div);
+    });
+    // Recalc totals
+    S.mats.forEach(m=>{
+      let t=0;DV.forEach(d=>{const h2=S.dh[m.id+'_'+d]||{};const l=Object.keys(h2).sort().pop();if(l)t+=h2[l]});
+      m.e=t;if(!S.dh[m.id])S.dh[m.id]={};S.dh[m.id][dt]=t;
+    });
+    window._gsLog={dt,divs:updatedDivs,mats:totalMats};
+    sv();toast(`✓ ${updatedDivs.length} divisão(ões) — ${totalMats} materiais!`);R();
+  }catch(e){toast('Erro: '+e.message);console.error(e)}
+}
+
+// ===== WAREHOUSE =====
+function getDivStock(matId,div){const h=S.dh[matId+'_'+div]||{};const l=Object.keys(h).sort().pop();return l?h[l]:0}
+function rW(){const ms=S.mats.map(m=>({...m,dias:gD(m),cons:gC(m.id)*30,eAC:getDivStock(m.id,DV[0]),eBT:getDivStock(m.id,DV[1])}));let f=window._wF||'all',q=(window._wQ||'').toLowerCase(),wv=window._wV||'geral';let d=ms.filter(m=>{if(q&&!m.m.toLowerCase().includes(q)&&!m.g.toLowerCase().includes(q)&&!(m.sap||'').includes(q))return false;if(f==='crit')return m.dias<m.mn&&m.cons>0;if(f==='ok')return m.dias>=m.mn||m.cons===0;return true}).sort((a,b)=>a.dias-b.dias);
+let h=`<div class="st2">Warehouse</div><div class="tb"><input class="si" style="width:180px" placeholder="Buscar..." value="${window._wQ||''}" oninput="window._wQ=this.value;R()"><button class="fb ${f==='all'?'on':''}" onclick="window._wF='all';R()">Todos</button><button class="fb ${f==='crit'?'on':''}" onclick="window._wF='crit';R()">Críticos</button><button class="fb ${f==='ok'?'on':''}" onclick="window._wF='ok';R()">Ok</button><button class="btn b1 bs2" onclick="mAM()">+ Material</button><button class="btn b3 bs2" onclick="zeroStock()">🗑 Zerar Estoque</button></div>`;
+h+=`<div class="dt" style="margin-bottom:10px"><div class="dt-t ${wv==='geral'?'on':''}" onclick="window._wV='geral';R()">📦 Geral</div><div class="dt-t ${wv==='acl'?'on':''}" onclick="window._wV='acl';R()">Água Clara</div><div class="dt-t ${wv==='btg'?'on':''}" onclick="window._wV='btg';R()">Bataguassu</div></div>`;
+// KPIs per view
+const ttAC=d.reduce((a,m)=>a+m.eAC,0),ttBT=d.reduce((a,m)=>a+m.eBT,0),ttG=d.reduce((a,m)=>a+m.e,0);
+h+=`<div class="kg" style="margin-bottom:10px"><div class="k c"><div class="kl">Total Geral</div><div class="kv">${fm(ttG)}</div></div><div class="k p"><div class="kl">Água Clara</div><div class="kv">${fm(ttAC)}</div></div><div class="k a"><div class="kl">Bataguassu</div><div class="kv">${fm(ttBT)}</div></div><div class="k g"><div class="kl">Materiais</div><div class="kv">${d.length}</div></div></div>`;
+if(wv==='geral'){
+  h+=`<div class="tw"><table><thead><tr><th>SAP</th><th>Grupo</th><th>Material</th><th>Un</th><th style="color:var(--ac)">Total</th><th style="color:var(--p)">AC</th><th style="color:#fbbf24">BTG</th><th>Cons/mês</th><th>Dias</th><th>Mín</th><th>Rep</th><th>Máx</th><th>Nível</th><th></th></tr></thead><tbody>${d.map(m=>{const s=gS(m.dias,m.mn);return`<tr><td>${sapTag(m.sap)}</td><td>${m.g}</td><td style="font-weight:600">${m.m}</td><td>${m.u}</td><td class="mono" style="font-weight:700;color:var(--ac)">${fm(m.e)}</td><td class="mono" style="color:var(--p)">${fm(m.eAC)}</td><td class="mono" style="color:#fbbf24">${fm(m.eBT)}</td><td class="mono">${fm(m.cons)}</td><td class="mono" style="font-weight:700;color:var(--${s.v==='d'?'d':s.v==='w'?'w':'g'})">${fd(m.dias)}</td><td>${m.mn}</td><td>${m.rp}</td><td>${m.mx}</td><td>${sB(m.dias,m.mx)}</td><td><button class="bs2 b2" onclick="mEM(${m.id})">✎</button><button class="bs2 b3" onclick="dM(${m.id})">✕</button></td></tr>`}).join('')}</tbody></table></div>`;
+}else{
+  const divN=wv==='acl'?DV[0]:DV[1];const eK=wv==='acl'?'eAC':'eBT';const cl=wv==='acl'?'var(--p)':'#fbbf24';
+  h+=`<div class="tw"><table><thead><tr><th>SAP</th><th>Grupo</th><th>Material</th><th>Un</th><th style="color:${cl}">${divN}</th><th style="color:var(--t3)">% do Total</th><th>Total</th><th>Nível</th><th></th></tr></thead><tbody>${d.map(m=>{const v=m[eK];const pct=m.e>0?((v/m.e)*100).toFixed(0):0;const s=gS(m.dias,m.mn);return`<tr><td>${sapTag(m.sap)}</td><td>${m.g}</td><td style="font-weight:600">${m.m}</td><td>${m.u}</td><td class="mono" style="font-weight:700;color:${cl}">${fm(v)}</td><td class="mono" style="color:var(--t3)">${pct}%</td><td class="mono">${fm(m.e)}</td><td>${sB(m.dias,m.mx)}</td><td><button class="bs2 b2" onclick="mEM(${m.id})">✎</button></td></tr>`}).join('')}</tbody></table></div>`;
+}
+return h}
+function mAM(){oM(`<button class="mc" onclick="cM()">✕</button><h3>Novo Material</h3><div class="fr"><div class="fg"><label class="fl">Código SAP</label><input class="fi" id="ns"></div><div class="fg"><label class="fl">Grupo</label><input class="fi" id="ng"></div></div><div class="fg"><label class="fl">Material</label><input class="fi" id="nm2"></div><div class="fr"><div class="fg"><label class="fl">Un</label><select class="fi" id="nu"><option>KG</option><option>L</option><option>UN</option></select></div><div class="fg"><label class="fl">Estoque</label><input class="fi" id="ne" type="number" value="0"></div></div><div class="fr3"><div class="fg"><label class="fl">Mín</label><input class="fi" id="ni2" type="number" value="30"></div><div class="fg"><label class="fl">Rep</label><input class="fi" id="nr2" type="number" value="50"></div><div class="fg"><label class="fl">Máx</label><input class="fi" id="nx2" type="number" value="60"></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="aM()">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)}
+function aM(){const m={id:ni(),sap:document.getElementById('ns').value,g:document.getElementById('ng').value,m:document.getElementById('nm2').value,u:document.getElementById('nu').value,e:+document.getElementById('ne').value,mn:+document.getElementById('ni2').value,rp:+document.getElementById('nr2').value,mx:+document.getElementById('nx2').value};if(!m.m){toast('Informe material');return}S.mats.push(m);sv();cM();toast('Cadastrado!');R()}
+function mEM(id){const m=S.mats.find(x=>x.id===id);if(!m)return;oM(`<button class="mc" onclick="cM()">✕</button><h3>Editar: ${m.m}</h3><div class="fr"><div class="fg"><label class="fl">SAP</label><input class="fi" id="es2" value="${m.sap||''}"></div><div class="fg"><label class="fl">Grupo</label><input class="fi" id="eg" value="${m.g}"></div></div><div class="fg"><label class="fl">Material</label><input class="fi" id="em2" value="${m.m}"></div><div class="fr3"><div class="fg"><label class="fl">Mín</label><input class="fi" id="ei" type="number" value="${m.mn}"></div><div class="fg"><label class="fl">Rep</label><input class="fi" id="er" type="number" value="${m.rp}"></div><div class="fg"><label class="fl">Máx</label><input class="fi" id="ex" type="number" value="${m.mx}"></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="sM(${id})">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)}
+function sM(id){const m=S.mats.find(x=>x.id===id);m.sap=document.getElementById('es2').value;m.g=document.getElementById('eg').value;m.m=document.getElementById('em2').value;m.mn=+document.getElementById('ei').value;m.rp=+document.getElementById('er').value;m.mx=+document.getElementById('ex').value;sv();cM();toast('Atualizado!');R()}
+function dM(id){if(!confirm('Remover?'))return;S.mats=S.mats.filter(m=>m.id!==id);sv();toast('Removido');R()}
+function zeroStock(){
+  oM(`<button class="mc" onclick="cM()">✕</button><h3>🗑 Zerar Estoque</h3>
+<div class="ib">Isso vai <strong>zerar o estoque de TODOS os materiais</strong> (Total, Água Clara e Bataguassu) para que você possa começar a inserir os saldos diários do zero.<br><br>O histórico de registros anteriores será <strong>mantido</strong>.</div>
+<div class="fg"><label class="fl">Confirme digitando ZERAR</label><input class="fi" id="zConf" placeholder="ZERAR"></div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn b3" onclick="execZero()">Confirmar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)
+}
+function execZero(){
+  if(document.getElementById('zConf').value.trim().toUpperCase()!=='ZERAR'){toast('Digite ZERAR para confirmar');return}
+  S.mats.forEach(m=>{m.e=0});
+  // Zero last entry in division histories
+  const dt=td2();
+  S.mats.forEach(m=>{
+    DV.forEach(d=>{const k=m.id+'_'+d;if(!S.dh[k])S.dh[k]={};S.dh[k][dt]=0});
+    if(!S.dh[m.id])S.dh[m.id]={};S.dh[m.id][dt]=0;
+  });
+  sv();cM();toast('✓ Estoque zerado!');R();
+}
+
+// ===== CONTRATOS =====
+function rCt(){let q=(window._cQ||'').toLowerCase();let d=S.cts.filter(c=>!q||c.g.toLowerCase().includes(q)||c.ins.toLowerCase().includes(q)||c.fo.toLowerCase().includes(q));
+const getSap=c=>{const m=getMat(c.matId);return m?m.sap:''};
+return`<div class="st2">Contratos</div><div class="tb"><input class="si" style="width:180px" placeholder="Buscar..." value="${window._cQ||''}" oninput="window._cQ=this.value;R()"><button class="btn b1 bs2" onclick="mAC()">+ Contrato</button></div><div class="tw"><table><thead><tr><th>SAP</th><th>Grupo</th><th>Insumo</th><th>Fornecedor</th><th>Rep</th><th>Tel</th><th>Tipo</th><th>Venc</th><th>Nº</th><th>Status</th><th>Fixado</th><th>%Saldo</th><th>Preço</th><th>Prazo</th><th></th></tr></thead><tbody>${d.map(c=>{const sc=c.sd>50?'g':c.sd>20?'w':'d';return`<tr><td>${sapTag(getSap(c))}</td><td style="font-weight:600">${c.g}</td><td>${c.ins}</td><td>${c.fo}</td><td style="font-size:9px">${c.rp||'—'}</td><td style="font-size:9px">${c.tel||'—'}</td><td>${bd(c.tp==='Anual'?'bp':'bc',c.tp)}</td><td class="mono" style="font-size:9px">${c.vc}</td><td class="mono" style="font-size:9px">${c.nu}</td><td>${bd(sb2(c.st),c.st)}</td><td class="mono">${fR(c.fx)}</td><td class="mono" style="font-weight:700;color:var(--${sc})">${c.sd.toFixed(1)}%</td><td class="mono">R$${c.pr.toFixed(2)}</td><td>${c.pe}d</td><td><button class="bs2 b2" onclick="mEC(${c.id})">✎</button><button class="bs2 b3" onclick="dC(${c.id})">✕</button></td></tr>`}).join('')}</tbody></table></div>`}
+function mAC(){oM(`<button class="mc" onclick="cM()">✕</button><h3>Novo Contrato</h3><div class="fg"><label class="fl">Material (Warehouse)</label><select class="fi" id="cmi" onchange="fillCtMat()">${matOpts()}</select></div><div class="fr"><div class="fg"><label class="fl">Grupo</label><input class="fi" id="cg" readonly></div><div class="fg"><label class="fl">Insumo</label><input class="fi" id="ci2"></div></div><div class="fr"><div class="fg"><label class="fl">Fornecedor</label><input class="fi" id="cf"></div><div class="fg"><label class="fl">Representante</label><input class="fi" id="cr2"></div></div><div class="fr"><div class="fg"><label class="fl">Email</label><input class="fi" id="ce" type="email"></div><div class="fg"><label class="fl">Telefone</label><input class="fi" id="ctl"></div></div><div class="fr"><div class="fg"><label class="fl">Prazo (dias)</label><input class="fi" id="cp" type="number" value="10"></div><div class="fg"><label class="fl">Tipo</label><select class="fi" id="ct3"><option>Anual</option><option>Temporário</option></select></div></div><div class="fr"><div class="fg"><label class="fl">Vencimento</label><input class="fi" id="cv" type="date"></div><div class="fg"><label class="fl">Nº Contrato</label><input class="fi" id="cn"></div></div><div class="fr3"><div class="fg"><label class="fl">Valor Fixado</label><input class="fi" id="cx" type="number" value="0"></div><div class="fg"><label class="fl">Preço</label><input class="fi" id="cpr" type="number" step="0.01"></div><div class="fg"><label class="fl">Status</label><select class="fi" id="cs"><option>Aprovação</option><option>Finalizado</option><option>Inativo</option></select></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="aC()">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`);fillCtMat()}
+function fillCtMat(){const sel=document.getElementById('cmi');const m=getMat(sel.value);if(m){document.getElementById('cg').value=m.g;document.getElementById('ci2').value=m.m}}
+function aC(){const mi=+document.getElementById('cmi').value;const c={id:ni(),matId:mi,g:document.getElementById('cg').value,ins:document.getElementById('ci2').value,fo:document.getElementById('cf').value,rp:document.getElementById('cr2').value,em:document.getElementById('ce').value,tel:document.getElementById('ctl').value,pe:+document.getElementById('cp').value,tp:document.getElementById('ct3').value,vc:document.getElementById('cv').value,nu:document.getElementById('cn').value,fx:+document.getElementById('cx').value,ab:+document.getElementById('cx').value,sd:100,pr:+document.getElementById('cpr').value,st:document.getElementById('cs').value};if(!c.ins){toast('Selecione material');return}S.cts.push(c);sv();cM();toast('Contrato criado!');R()}
+function mEC(id){const c=S.cts.find(x=>x.id===id);if(!c)return;oM(`<button class="mc" onclick="cM()">✕</button><h3>Editar: ${c.ins}</h3><div class="fr"><div class="fg"><label class="fl">Representante</label><input class="fi" id="er3" value="${c.rp||''}"></div><div class="fg"><label class="fl">Email</label><input class="fi" id="ee" value="${c.em||''}"></div></div><div class="fr"><div class="fg"><label class="fl">Telefone</label><input class="fi" id="et" value="${c.tel||''}"></div><div class="fg"><label class="fl">Prazo</label><input class="fi" id="ep" type="number" value="${c.pe}"></div></div><div class="fr"><div class="fg"><label class="fl">Saldo Aberto</label><input class="fi" id="ea" type="number" value="${c.ab}"></div><div class="fg"><label class="fl">%</label><input class="fi" id="es3" type="number" step="0.1" value="${c.sd}"></div></div><div class="fr"><div class="fg"><label class="fl">Status</label><select class="fi" id="est"><option ${c.st==='Aprovação'?'selected':''}>Aprovação</option><option ${c.st==='Finalizado'?'selected':''}>Finalizado</option><option ${c.st==='Inativo'?'selected':''}>Inativo</option></select></div><div class="fg"><label class="fl">Tipo</label><select class="fi" id="etp"><option ${c.tp==='Anual'?'selected':''}>Anual</option><option ${c.tp==='Temporário'?'selected':''}>Temporário</option></select></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="sC(${id})">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)}
+function sC(id){const c=S.cts.find(x=>x.id===id);c.rp=document.getElementById('er3').value;c.em=document.getElementById('ee').value;c.tel=document.getElementById('et').value;c.pe=+document.getElementById('ep').value;c.ab=+document.getElementById('ea').value;c.sd=+document.getElementById('es3').value;c.st=document.getElementById('est').value;c.tp=document.getElementById('etp').value;sv();cM();toast('Atualizado!');R()}
+function dC(id){if(!confirm('Remover?'))return;S.cts=S.cts.filter(c=>c.id!==id);sv();toast('Removido');R()}
+
+// ===== REQUISIÇÕES =====
+function rRc(){let q=(window._rQ||'').toLowerCase();let d=S.rcs.filter(r=>!q||r.mat.toLowerCase().includes(q)||r.fo.toLowerCase().includes(q)||(r.sap||'').includes(q));
+let h=`<div class="st2">Requisições de Compra</div><div class="tb"><input class="si" style="width:180px" placeholder="Buscar..." value="${window._rQ||''}" oninput="window._rQ=this.value;R()"><button class="btn b1 bs2" onclick="mAR()">+ Nova RC</button></div><div class="ib"><strong>Fluxo:</strong> RC Criada → Em Aprovação → Pedido Emitido → Entrega Solicitada → Em Trânsito → Entregue</div><div class="tw" style="max-height:400px;overflow-y:auto"><table><thead><tr><th>SAP</th><th>Material</th><th>Fornecedor</th><th>RC</th><th>Qtd</th><th>Prev</th><th>Contrato</th><th>Status</th><th>NF</th><th>LT</th><th></th></tr></thead><tbody>`;
+d.forEach(r=>{const ct=r.ctId?S.cts.find(c=>c.id===r.ctId):null;const si=RC_ST.indexOf(r.st2||'RC Criada');h+=`<tr><td>${sapTag(r.sap)}</td><td style="font-weight:600">${r.mat}</td><td>${r.fo}</td><td class="mono" style="font-size:9px">${r.rc}</td><td class="mono">${fm(r.qtd)}</td><td class="mono" style="font-size:9px">${r.prev||'—'}</td><td>${ct?bd('bc',ct.nu.substring(0,10)):'—'}</td><td><div class="wf">${rcWf(si)}</div></td><td class="mono" style="font-size:9px">${r.nf||'—'}</td><td class="mono">${r.lt?r.lt+'d':'—'}</td><td style="white-space:nowrap">${si<5?`<button class="bs2 b1" onclick="advRC(${r.id})">▶</button>`:''}<button class="bs2 b4" onclick="mailRC(${r.id})">✉</button><button class="bs2 b3" onclick="dR(${r.id})">✕</button></td></tr>`});
+h+=`</tbody></table></div><div class="cc" style="margin-top:10px"><div class="ct">📧 Emails CC</div><div class="tb"><input class="si" style="width:220px" id="ccI" placeholder="email@exemplo.com"><button class="btn b1 bs2" onclick="addCC()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap">`;
+(S.cc||[]).forEach((e,i)=>h+=`<span class="b bc" style="cursor:pointer" onclick="rmCC(${i})">${e} ✕</span>`);h+=`</div></div>`;return h}
+
+function mAR(){
+  // Only show materials from Warehouse and contracts linked to materials
+  const ctO=S.cts.filter(c=>c.st!=='Inativo').map(c=>{const m=getMat(c.matId);return`<option value="${c.id}">${c.nu} — ${c.ins}${m?' ('+m.sap+')':''}</option>`}).join('');
+  oM(`<button class="mc" onclick="cM()">✕</button><h3>Nova RC</h3><div class="fg"><label class="fl">Material (Warehouse)</label><select class="fi" id="rmi" onchange="fillRcMat()">${matOpts()}</select></div><div class="fr"><div class="fg"><label class="fl">Comprador</label><input class="fi" id="rc3"></div><div class="fg"><label class="fl">Fornecedor</label><input class="fi" id="rf2"></div></div><div class="fr"><div class="fg"><label class="fl">Nº RC</label><input class="fi" id="rn"></div><div class="fg"><label class="fl">Data</label><input class="fi" id="rd" type="date" value="${td2()}"></div></div><div class="fr"><div class="fg"><label class="fl">Quantidade</label><input class="fi" id="rq" type="number"></div><div class="fg"><label class="fl">Pedido</label><input class="fi" id="rp2"></div></div><div class="fr"><div class="fg"><label class="fl">Previsão Entrega</label><input class="fi" id="rprev" type="date"></div><div class="fg"><label class="fl">Contrato</label><select class="fi" id="rct"><option value="">— Nenhum —</option>${ctO}</select></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="aR()">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)
+}
+function fillRcMat(){const m=getMat(document.getElementById('rmi').value);/* auto-fill if needed */}
+function aR(){const mi=+document.getElementById('rmi').value;const m=getMat(mi);const r={id:ni(),matId:mi,mat:m?m.m:'',sap:m?m.sap:'',fo:document.getElementById('rf2').value,comp:document.getElementById('rc3').value,rc:document.getElementById('rn').value,dt:document.getElementById('rd').value,qtd:+document.getElementById('rq').value,ped:document.getElementById('rp2').value,prev:document.getElementById('rprev').value,st2:'RC Criada',nf:'',lt:0,ctId:document.getElementById('rct').value?+document.getElementById('rct').value:null,dtEnt:'',qtdEnt:0,div:''};
+if(!r.mat){toast('Selecione material');return}if(r.ctId){const c=S.cts.find(x=>x.id===r.ctId);if(c){c.ab=Math.max(0,c.ab-r.qtd*c.pr);c.sd=c.fx>0?(c.ab/c.fx)*100:0}}S.rcs.push(r);sv();cM();toast('RC criada!');R()}
+function advRC(id){const r=S.rcs.find(x=>x.id===id);if(!r)return;const i=RC_ST.indexOf(r.st2||'RC Criada');if(i===4){oM(`<button class="mc" onclick="cM()">✕</button><h3>📦 Confirmar Entrega</h3><div class="fg"><label class="fl">Data</label><input class="fi" id="ced" type="date" value="${td2()}"></div><div class="fg"><label class="fl">NF</label><input class="fi" id="cen"></div><div class="fg"><label class="fl">Qtd</label><input class="fi" id="ceq" type="number" value="${r.qtd}"></div><div class="fg"><label class="fl">Divisão</label><select class="fi" id="cev"><option>${DV[0]}</option><option>${DV[1]}</option></select></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="confE(${id})">Confirmar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)}else if(i<5){r.st2=RC_ST[i+1];sv();toast(`→ ${r.st2}`);R()}}
+function confE(id){const r=S.rcs.find(x=>x.id===id);r.dtEnt=document.getElementById('ced').value;r.nf=document.getElementById('cen').value;r.qtdEnt=+document.getElementById('ceq').value;r.div=document.getElementById('cev').value;r.st2='Entregue';r.lt=Math.max(0,Math.round((new Date(r.dtEnt)-new Date(r.dt))/864e5));sv();cM();toast('Entregue!');R()}
+function mailRC(id){const r=S.rcs.find(x=>x.id===id);if(!r)return;const ct=r.ctId?S.cts.find(c=>c.id===r.ctId):null;const to=ct?.em||'';const cc=(S.cc||[]).join(',');const subj=encodeURIComponent(`Requisição de ${r.mat} RC ${r.rc}`);const prev=r.prev?new Date(r.prev+'T12:00:00').toLocaleDateString('pt-BR'):'a definir';const body=encodeURIComponent(`Olá,\n\nSolicito a entrega do material ${r.mat} na quantidade ${r.qtd} com previsão de entrega na data ${prev} referente a RC ${r.rc}.\n\nAtenciosamente.`);window.open(`mailto:${to}?cc=${cc}&subject=${subj}&body=${body}`);toast('Email!')}
+function addCC(){const v=document.getElementById('ccI')?.value;if(!v||!v.includes('@'))return;if(!S.cc)S.cc=[];S.cc.push(v);sv();R()}
+function rmCC(i){S.cc.splice(i,1);sv();R()}
+function dR(id){if(!confirm('Remover?'))return;S.rcs=S.rcs.filter(r=>r.id!==id);sv();toast('Removido');R()}
+
+// ===== PLANO DE AÇÃO =====
+function rPa(){let q=(window._pQ||'').toLowerCase(),f=window._pF||'all';let d=S.acts.filter(a=>{if(q&&!a.ass.toLowerCase().includes(q)&&!a.resp.toLowerCase().includes(q))return false;if(f!=='all'&&a.st!==f)return false;return true});
+let h=`<div class="st2">Plano de Ação</div><div class="tb"><input class="si" style="width:180px" placeholder="Buscar..." value="${window._pQ||''}" oninput="window._pQ=this.value;R()"><button class="fb ${f==='all'?'on':''}" onclick="window._pF='all';R()">Todas</button><button class="fb ${f==='Em andamento'?'on':''}" onclick="window._pF='Em andamento';R()">Andamento</button><button class="fb ${f==='Concluido'?'on':''}" onclick="window._pF='Concluido';R()">Concluído</button><button class="btn b1 bs2" onclick="mAP()">+ Ação</button></div>`;
+d.forEach(a=>{h+=`<div class="ac3"><div style="color:var(--ac);font-weight:600;min-width:80px;font-size:10px">${a.resp}</div><div style="flex:1"><div style="font-weight:600;font-size:12px">${a.ass}</div><div style="font-size:10px;color:var(--t3)">${a.obs}</div></div>${bd(sb2(a.st),a.st)}<div class="mono" style="font-size:10px;color:var(--t3);min-width:60px;text-align:right">${a.dt||'—'}</div><div style="display:flex;gap:2px">${a.st!=='Concluido'&&a.st!=='Cancelado'?`<button class="bs2 b1" onclick="cPA(${a.id})">✓</button>`:''}<button class="bs2 b3" onclick="xPA(${a.id})">✕</button><button class="bs2 b3" onclick="dPA(${a.id})">🗑</button></div></div>`});return h}
+function mAP(){oM(`<button class="mc" onclick="cM()">✕</button><h3>Nova Ação</h3><div class="fr"><div class="fg"><label class="fl">Responsável</label><input class="fi" id="pr"></div><div class="fg"><label class="fl">Assunto</label><input class="fi" id="pa3"></div></div><div class="fg"><label class="fl">Obs</label><input class="fi" id="po"></div><div class="fr"><div class="fg"><label class="fl">Status</label><select class="fi" id="ps"><option>Não iniciado</option><option>Em andamento</option></select></div><div class="fg"><label class="fl">Prazo</label><input class="fi" id="pd2"></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="aPA()">Salvar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)}
+function aPA(){const a={id:ni(),resp:document.getElementById('pr').value,ass:document.getElementById('pa3').value,obs:document.getElementById('po').value,st:document.getElementById('ps').value,dt:document.getElementById('pd2').value};if(!a.ass){toast('Assunto');return}S.acts.push(a);sv();cM();toast('Criada!');R()}
+function cPA(id){const a=S.acts.find(x=>x.id===id);if(a){a.st='Concluido';a.dt=new Date().toLocaleDateString('pt-BR');sv();toast('Concluída!');R()}}
+function xPA(id){const a=S.acts.find(x=>x.id===id);if(a){a.st='Cancelado';sv();toast('Cancelada');R()}}
+function dPA(id){if(!confirm('Remover?'))return;S.acts=S.acts.filter(a=>a.id!==id);sv();toast('Removida');R()}
+
+// ===== TIMELINE =====
+function rTl(){let sel=window._tP||S.mats[0]?.m||'';let opts=S.mats.map(m=>`<option ${m.m===sel?'selected':''}>${m.sap||''} — ${m.m}</option>`).join('');const mat=S.mats.find(m=>m.m===sel||`${m.sap} — ${m.m}`===sel);const matR=mat||S.mats[0];const hist=matR?S.dh[matR.id]||{}:{};const ent=Object.entries(hist).sort((a,b)=>a[0].localeCompare(b[0]));let ch='';if(ent.length>1){const cd=gC(matR.id);const mx=Math.max(...ent.map(e=>cd>0?e[1]/cd:0),1);ch=ent.map(([d,v])=>{const ds=cd>0?v/cd:0;const h=Math.max(4,(ds/mx)*190);const c=ds<matR.mn?'var(--d)':ds<matR.rp?'var(--w)':'var(--ac)';return`<div class="bc2"><div class="bv2">${ds.toFixed(0)}</div><div class="bar" style="height:${h}px;background:${c}"></div><div class="bl">${d.substring(5)}</div></div>`}).join('')}
+return`<div class="st2">Time Line</div><div class="tb"><select class="si" style="width:220px" onchange="window._tP=this.options[this.selectedIndex].text.split(' — ').pop();R()">${opts}</select></div><div class="cc"><div class="ct">${sapTag(matR?.sap)} ${matR?.m||sel}</div>${ent.length>1?`<div style="overflow-x:auto"><div class="bw" style="min-width:${ent.length*32}px;height:200px">${ch}</div></div>`:'<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">Registre ao menos 2 dias</div>'}</div>${matR?`<div class="g3"><div class="k c"><div class="kl">Estoque</div><div class="kv">${fm(matR.e)}</div></div><div class="k ${gD(matR)<matR.mn?'r':'g'}"><div class="kl">Dias</div><div class="kv">${fd(gD(matR))}</div></div><div class="k a"><div class="kl">Cons/mês</div><div class="kv">${fm(gC(matR.id)*30)}</div></div></div>`:''}`}
+
+// ===== RF =====
+function rRf(){let q=(window._rfQ||'').toLowerCase();let d=S.rf.filter(r=>!q||r.ins.toLowerCase().includes(q));
+return`<div class="st2">Consumo RF — Editável</div><div class="tb"><input class="si" style="width:180px" placeholder="Buscar..." value="${window._rfQ||''}" oninput="window._rfQ=this.value;R()"><button class="btn b1 bs2" onclick="svRf()">💾 Salvar</button><button class="btn b5 bs2" onclick="mARf()">+ Material</button></div><div class="tw" style="max-height:400px;overflow-y:auto"><table><thead><tr><th>SAP</th><th>Insumo</th><th>Cat</th>${MS.map(m=>`<th>${m}</th>`).join('')}<th>TT</th></tr></thead><tbody>${d.map((r,ri)=>{const m=getMat(r.matId);const tt=r.m26.reduce((a,b)=>a+b,0);return`<tr><td>${sapTag(m?.sap)}</td><td style="font-weight:600">${r.ins}</td><td>${bd('bc',r.cat)}</td>${r.m26.map((v,mi)=>`<td><input class="ed" value="${Math.round(v)}" onchange="S.rf[${ri}].m26[${mi}]=+this.value"></td>`).join('')}<td class="mono" style="font-weight:700;color:var(--ac)">${fm(tt)}</td></tr>`}).join('')}</tbody></table></div>`}
+function svRf(){sv();toast('RF salvo!')}
+function mARf(){
+  // Only show materials not already in RF
+  const existing=new Set(S.rf.map(r=>r.matId));
+  const avail=S.mats.filter(m=>!existing.has(m.id));
+  if(!avail.length){toast('Todos os materiais já estão no RF');return}
+  oM(`<button class="mc" onclick="cM()">✕</button><h3>Adicionar Material ao RF</h3><div class="fg"><label class="fl">Material (Warehouse)</label><select class="fi" id="rfm">${avail.map(m=>`<option value="${m.id}">${m.sap||''} — ${m.m}</option>`).join('')}</select></div><div class="fg"><label class="fl">Categoria</label><input class="fi" id="rfc"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn b1" onclick="aRf()">Adicionar</button><button class="btn b2" onclick="cM()">Cancelar</button></div>`)
+}
+function aRf(){const mi=+document.getElementById('rfm').value;const m=getMat(mi);if(!m){toast('Selecione');return}S.rf.push({ins:m.m,matId:mi,cat:document.getElementById('rfc').value||m.g,h24:new Array(12).fill(0),h25:new Array(12).fill(0),m26:new Array(12).fill(0)});sv();cM();toast('Adicionado!');R()}
+
+// ===== HISTÓRICO =====
+function rH(){let h=`<div class="st2">Histórico 2024 · 2025 · 2026</div><div class="cc"><div class="ct">📅 Calendário Sazonal</div><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">`;
+[{m:'Jan',t:['Plantio','Chuva'],c:['tg2','tr2']},{m:'Fev',t:['Plantio','Chuva'],c:['tg2','tr2']},{m:'Mar',t:['Chuva'],c:['tr2']},{m:'Abr',t:['Pragas'],c:['tp2']},{m:'Mai',t:['Pragas','Formiga'],c:['tp2','tp2']},{m:'Jun',t:['Formiga'],c:['tp2']},{m:'Jul',t:['Formiga'],c:['tp2']},{m:'Ago',t:['Manutenção'],c:['tw3']},{m:'Set',t:['Manutenção'],c:['tw3']},{m:'Out',t:['Preparo'],c:['tw3']},{m:'Nov',t:['Plantio'],c:['tg2']},{m:'Dez',t:['Plantio','Chuva'],c:['tg2','tr2']}].forEach(s=>{h+=`<div style="text-align:center;padding:4px 2px;border-radius:5px;background:var(--s2);border:1px solid var(--bd)"><div style="font-weight:600;font-size:10px;margin-bottom:2px">${s.m}</div>${s.t.map((t,i)=>`<span class="tag ${s.c[i]}">${t}</span>`).join('')}</div>`});h+=`</div></div>`;
+// Show ALL materials — use RF data if available, otherwise show placeholder
+S.mats.forEach(mat=>{
+  const rf=S.rf.find(r=>r.matId===mat.id);
+  const has24=rf&&rf.h24&&rf.h24.some(v=>v>0);
+  const has25=rf&&rf.h25&&rf.h25.some(v=>v>0);
+  const has26=rf&&rf.m26&&rf.m26.some(v=>v>0);
+  const hasAny=has24||has25||has26;
+  const h24=rf?rf.h24:new Array(12).fill(0);
+  const h25=rf?rf.h25:new Array(12).fill(0);
+  const m26=rf?rf.m26:new Array(12).fill(0);
+  const cat=rf?rf.cat:mat.g;
+  const a24=h24.reduce((a,b)=>a+b,0)/12,a25=h25.reduce((a,b)=>a+b,0)/12,a26=m26.reduce((a,b)=>a+b,0)/12;
+  const pks=[];h25.forEach((v,i)=>{if(a25>0&&v>a25*1.4)pks.push(MS[i])});
+  const mx=Math.max(...h24,...h25,...m26,1);
+  h+=`<div class="cc"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600;font-size:12px">${sapTag(mat.sap)} ${mat.m} ${bd('bc',cat)}</span><span style="font-size:9px;color:var(--t3)">24:${fm(a24)} · 25:${fm(a25)} · 26:${fm(a26)}/mês</span></div>`;
+  if(pks.length)h+=`<div class="ha">⚠ Picos 2025: ${pks.map(p=>`<span class="tag tw3">${p}</span>`).join('')}</div>`;
+  if(hasAny){
+    h+=`<div style="display:flex;align-items:flex-end;gap:2px;height:60px">`;for(let i=0;i<12;i++){const hh24=Math.max(1,(h24[i]/mx)*50),hh25=Math.max(1,(h25[i]/mx)*50),hh26=Math.max(1,(m26[i]/mx)*50);h+=`<div style="flex:1;display:flex;gap:1px;align-items:flex-end"><div style="flex:1;height:${hh24}px;background:rgba(100,116,139,.3);border-radius:2px 2px 0 0" title="24 ${MS[i]}: ${fm(h24[i])}"></div><div style="flex:1;height:${hh25}px;background:rgba(167,139,250,.4);border-radius:2px 2px 0 0" title="25 ${MS[i]}: ${fm(h25[i])}"></div><div style="flex:1;height:${hh26}px;background:var(--ac);border-radius:2px 2px 0 0" title="26 ${MS[i]}: ${fm(m26[i])}"></div></div>`}
+    h+=`</div><div style="display:flex;gap:2px;margin:2px 0">`;MS.forEach(m2=>h+=`<div style="flex:1;text-align:center;font-size:7px;color:var(--t3)">${m2}</div>`);
+    h+=`</div><div style="display:flex;gap:12px;font-size:9px;color:var(--t3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;background:rgba(100,116,139,.3);border-radius:1px"></span>2024</span><span style="display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;background:rgba(167,139,250,.4);border-radius:1px"></span>2025</span><span style="display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;background:var(--ac);border-radius:1px"></span>2026</span></div>`;
+  }else{
+    h+=`<div style="padding:10px;text-align:center;color:var(--t3);font-size:10px">Sem dados RF. Adicione no <strong style="color:var(--ac)">Consumo RF</strong> para ver comparativo.</div>`;
+  }
+  h+=`</div>`;
+});return h}
+
+// ===== FERRAMENTAS =====
+function rTo(){const del=S.rcs.filter(r=>r.st2==='Entregue'&&r.lt>0);const avgLt=del.length?del.reduce((a,r)=>a+r.lt,0)/del.length:0;const byF={};del.forEach(r=>{if(!byF[r.fo])byF[r.fo]={s:0,n:0};byF[r.fo].s+=r.lt;byF[r.fo].n++});
+const ms=S.mats.map(m=>({...m,dias:gD(m),cons:gC(m.id)*30})).filter(m=>m.cons>0).sort((a,b)=>a.dias-b.dias);
+let h=`<div class="st2">Ferramentas</div><div class="g2"><div class="cc"><div class="ct">📊 Previsão de Ruptura</div>`;
+ms.slice(0,12).forEach(m=>{const dt=new Date();dt.setDate(dt.getDate()+Math.floor(m.dias));const cl=m.dias<15?'var(--d)':m.dias<30?'var(--w)':'var(--ac)';h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:10px">${sapTag(m.sap)}<span style="min-width:80px;font-weight:600">${m.m}</span><span class="mono" style="min-width:30px;color:${cl};font-weight:700">${m.dias.toFixed(0)}d</span><span style="font-size:9px;color:var(--t3)">→ ${m.dias<999?dt.toLocaleDateString('pt-BR'):''}</span></div>`});
+h+=`</div><div class="cc"><div class="ct">⏱ Lead Time</div><div style="margin-bottom:8px;font-size:11px">Média: <strong class="mono" style="color:var(--ac)">${avgLt.toFixed(0)}d</strong></div>`;
+Object.entries(byF).sort((a,b)=>(b[1].s/b[1].n)-(a[1].s/a[1].n)).forEach(([f,d])=>{const av=d.s/d.n;const cl=av>30?'var(--d)':av>15?'var(--w)':'var(--g)';h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:10px"><span style="min-width:90px">${f}</span><span class="mono" style="color:${cl};font-weight:600">${av.toFixed(0)}d</span><span style="font-size:9px;color:var(--t3)">(${d.n}x)</span></div>`});
+if(!del.length)h+=`<div style="color:var(--t3);font-size:10px">Confirme entregas para dados</div>`;
+h+=`</div></div><div class="cc"><div class="ct">📋 Workflow</div>`;
+S.rcs.slice(-6).reverse().forEach(r=>{const i=RC_ST.indexOf(r.st2||'RC Criada');h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;padding:6px;background:var(--s2);border-radius:6px;font-size:10px">${sapTag(r.sap)}<span style="min-width:70px;font-weight:600">${r.mat}</span><div class="wf">${rcWf(i)}</div></div>`});
+if(!S.rcs.length)h+=`<div style="color:var(--t3);font-size:10px">Nenhuma RC</div>`;
+h+=`</div><div class="cc"><div class="ct">📊 Índice de Cobertura (60d)</div>`;
+ms.map(m=>({...m,idx:m.cons>0?(m.e/(m.cons/30*60))*100:999})).sort((a,b)=>a.idx-b.idx).slice(0,12).forEach(m=>{const p=Math.min(100,m.idx);const cl=p<50?'var(--d)':p<80?'var(--w)':'var(--g)';h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:10px">${sapTag(m.sap)}<span style="min-width:80px">${m.m}</span><div style="flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden"><div style="width:${p}%;height:100%;background:${cl};border-radius:3px"></div></div><span class="mono" style="min-width:30px;color:${cl}">${m.idx<999?m.idx.toFixed(0)+'%':'∞'}</span></div>`});
+h+=`</div>`;return h}
+
+init();
+</script>
+</body>
+</html>
